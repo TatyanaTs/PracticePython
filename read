@@ -50,3 +50,25 @@ LOGMDATTIM,LOGMTYPE,LOGMBISID,LOGMMSG,ERROR
 2023-08-10 20:08:39.121468,RT17,oo6b14jx1n,0425NCRPOoo6b14jx1n                                                                                                                                                                                                                                                                                                                                                                                                                                                    0001KST0103 Сальдо счета 96434S0877001 должно быть больше нуля.,0001KST0103 Сальдо счета 96434S0877001 должно быть больше нуля.
 2023-08-10 20:08:44.397132,IB76,mfju8y473j,0015NIB76mfju8y473j712288STOLSTL   IWAY_EVO  0010R1973863199HCAНет информации,010R1973863199HCAНет информации
 2023-08-10 20:08:45.885393,RT10,6effvyv12x,"0015NRT106effvyv12x712288STOLSTL   IWAY_EVO  00020001Клиент не найден:GFPF, SVTO(442905)","0020001Клиент не найден:GFPF, SVTO(442905)"
+
+
+# Функция для получения первой ошибки указанной длины
+def get_first_error_of_length(errors, target_length):
+    for error in errors:
+        if len(error) == target_length:
+            return error
+    return None
+
+# Группировка по LOGMTYPE и длине ошибки, а затем подсчет количества
+grouped = df.groupby(['LOGMTYPE', df['ERROR'].apply(len)])['ERROR'].apply(list).reset_index(name='errors')
+grouped['first_error'] = grouped['errors'].apply(lambda x: get_first_error_of_length(x, grouped['ERROR'][0]))
+
+# Вывод результата
+result = grouped[['LOGMTYPE', 'first_error', 'errors']].rename(columns={'errors': 'error_count'})
+print(result)
+Этот код создает новую таблицу, где каждая строка представляет собой уникальную комбинацию LOGMTYPE и длины ошибки, а также первую ошибку указанной длины и количество таких ошибок.
+
+
+
+
+
